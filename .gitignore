@@ -1,0 +1,12 @@
+# Ignore any build folders
+*build*
+
+# Include build scripts
+!build-scripts
+
+# Ignore editor configurations
+.idea
+.vs
+.vscode
+CMakeLists.txt.user
+CMakeSettings.json
