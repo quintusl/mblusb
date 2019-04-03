@@ -38,7 +38,16 @@ if(MSVC)
 endif()
 
 # Add src folder
-add_subdirectory(src)
+include_directories(src src/windows ${CMAKE_CURRENT_BINARY_DIR})
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/")
+find_package(LibUSB)
+
+# Compile sources
+add_executable(mblusb src/mblusb.c src/windows/configure_layout.c)
+target_include_directories(mblusb PUBLIC ${LIBUSB_1_INCLUDE_DIRS})
+target_link_libraries(mblusb ${LIBUSB_1_LIBRARIES})
+# target_compile_options(mblusb PUBLIC ${LIBUSB_CFLAGS_OTHER})
 
 if(BUILD_TESTS)
 	add_subdirectory(tests)
