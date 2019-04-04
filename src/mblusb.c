@@ -9,7 +9,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -37,27 +37,27 @@
 /*                        Function prototypes                           */
 /************************************************************************/
 
-void print_keyfile(uint16_t *p_layout_array, uint8_t nlayers);
-void print_macrosfile(uint8_t *p_macros_array);
-uint16_t *fill_layout_array(uint8_t nlayers);
-uint8_t *fill_macros_array(void);
-uint8_t parse_keyfile(uint8_t *keyfile_namestring);
-void parse_macrosfile(uint8_t *keyfile_namestring);
+void print_keyfile(char *p_layout_array, uint8_t nlayers);
+void print_macrosfile(char *p_macros_array);
+char *fill_layout_array(uint8_t nlayers);
+char *fill_macros_array(void);
+uint8_t parse_keyfile(char *keyfile_namestring);
+void parse_macrosfile(char *keyfile_namestring);
 uint16_t read_matrix_pos(void);
 void read_pwm(void);
 void read_version(void);
 void write_pwm(int pwm_USB, int pwm_BT);
 void read_debounce(void);
 void write_debounce(int debounce_value);
-uint8_t *read_layout(void);
-void write_layout(uint8_t nlayers, uint16_t *p_layout_array);
-uint8_t *read_macros(void);
-void write_macros(uint8_t *p_char_ctrl_buf);
-void print_usage(uint8_t **argv);
+char *read_layout(void);
+void write_layout(uint8_t nlayers, char *p_layout_array);
+char *read_macros(void);
+void write_macros(unsigned char *p_char_ctrl_buf);
+void print_usage(char **argv);
 void enable_service_mode(void);
 void disable_service_mode(void);
 #ifdef _WIN32
-void configure_layout(uint8_t nlayers, uint16_t *p_layout_array_keyfile);
+void configure_layout(uint8_t nlayers, char *p_layout_array_keyfile);
 #endif
 
 /************************************************************************/
@@ -128,10 +128,10 @@ const uint16_t hid_code_array[] =
 /*                           Functions                                  */
 /************************************************************************/
 
-void print_keyfile(uint16_t *p_layout_array, uint8_t nlayers)
+void print_keyfile(char *p_layout_array, uint8_t nlayers)
 {
 	FILE *keyfile;
-	uint8_t char_buf[8] = { 0 }, scan_buf[256] = { 0 }, string_buf[256] = { 0 }, string_buf2[3072] = { 0 };
+	char char_buf[8] = { 0 }, scan_buf[256] = { 0 }, string_buf[256] = { 0 }, string_buf2[3072] = { 0 };
 
 	printf("\n\n");
 	printf("Enter filename: ");
@@ -188,10 +188,10 @@ void print_keyfile(uint16_t *p_layout_array, uint8_t nlayers)
 	}
 }
 
-void print_macrosfile(uint8_t *p_layout_array)
+void print_macrosfile(char *p_layout_array)
 {
 	FILE *keyfile;
-	uint8_t char_buf[8] = { 0 }, scan_buf[256] = { 0 }, string_buf[256] = { 0 }, string_buf2[3072] = { 0 };
+	char char_buf[8] = { 0 }, scan_buf[256] = { 0 }, string_buf[256] = { 0 }, string_buf2[3072] = { 0 };
 
 	printf("\n\n");
 	printf("Enter filename: ");
@@ -250,12 +250,12 @@ void print_macrosfile(uint8_t *p_layout_array)
 	}
 }
 
-uint8_t *fill_macros_array()
+char *fill_macros_array()
 {
 	uint8_t chardump = 0, n = 0;
-	uint8_t string_buf[8] = { 0 };
-	static uint8_t macros_array[192] = { 0 };
-	uint8_t *end_p = NULL;
+	char string_buf[8] = { 0 };
+	static char macros_array[192] = { 0 };
+	char *end_p = NULL;
 	uint8_t token = 0;
 
 	/*printf("\n\n");
@@ -271,7 +271,7 @@ uint8_t *fill_macros_array()
 		/* comma and newline character demarcate values, but	*
 		 * make sure not to repeat a value in case a comma is	*
 		 * followed by a newline character						*/
-		if (chardump == ',' || chardump == '\n' && n != 0)	
+		if (chardump == ',' || (chardump == '\n' && n != 0))	
 		{	
 			//printf("token %-2d\n", pos);	
 			// we have another token, flush string buffer 	
@@ -302,14 +302,14 @@ uint8_t *fill_macros_array()
 	return macros_array;
 }
 
-uint16_t *fill_layout_array(uint8_t nlayers)
+char *fill_layout_array(uint8_t nlayers)
 {
 	uint8_t chardump = 0, n = 0;
-	uint8_t string_buf[8] = { 0 };
-	uint8_t *end_p = NULL;
-	uint16_t *p_layout_array_keyfile = NULL;
+	char string_buf[8] = { 0 };
+	char *end_p = NULL;
+	char *p_layout_array_keyfile = NULL;
 
-	p_layout_array_keyfile = (uint16_t *)calloc(NUMKEYS * nlayers, sizeof(uint16_t));
+	p_layout_array_keyfile = (char *)calloc(NUMKEYS * nlayers, sizeof(char));
 
 	for (uint8_t layer = 0; layer < nlayers; layer++)
 	{
@@ -346,7 +346,7 @@ uint16_t *fill_layout_array(uint8_t nlayers)
 }
 
 
-uint8_t parse_keyfile(uint8_t *keyfile_namestring)
+uint8_t parse_keyfile(char *keyfile_namestring)
 {
 	uint8_t nlayers = 0, chardump = 0;
 	FILE *keyfile;
@@ -400,7 +400,7 @@ uint8_t parse_keyfile(uint8_t *keyfile_namestring)
 	return nlayers;
 }
 
-void parse_macrosfile(uint8_t *keyfile_namestring)
+void parse_macrosfile(char *keyfile_namestring)
 {
 	uint8_t chardump = 0;
 	FILE *keyfile;
@@ -557,9 +557,9 @@ void write_debounce(int debounce_value)
 
 }
 
-uint8_t* read_macros()
+char* read_macros()
 {
-	static uint8_t char_ctr_buf[192];
+	static unsigned char char_ctr_buf[192];
 	uint8_t bad_value1 = 0, bad_value2 = 0, macro_cnt = 0;
 
 	libusb_control_transfer(handle, LIBUSB_RECIPIENT_ENDPOINT | LIBUSB_ENDPOINT_IN |
@@ -580,7 +580,7 @@ uint8_t* read_macros()
 	}
 
 	printf("Macro key table\n\n");
-	printf("            Mods%-3cRsvd%-3cKey1%-3cKey2%-3cKey3%-3cKey4%-3cKey5%-3cKey6\n\n", '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0');
+	printf("            Mods%-3cRsvd%-3cKey1%-3cKey2%-3cKey3%-3cKey4%-3cKey5%-3cKey6\n\n", '\0', '\0', '\0', '\0', '\0', '\0', '\0');
 	printf("Macro %-6u", ++macro_cnt);
 
 	for (uint8_t i = 0; i < sizeof(char_ctr_buf); i++)
@@ -594,12 +594,12 @@ uint8_t* read_macros()
 			}
 	}
 
-	return char_ctr_buf;
+	return (char*)char_ctr_buf;
 }
 
-uint8_t *read_layout()
+char *read_layout()
 {
-	static uint8_t char_ctr_buf[2048] = { 0 };
+	static unsigned char char_ctr_buf[2048] = { 0 };
 	uint8_t layout_buf[2048] = {0};
 	uint8_t row_cnt, i, j;
 	uint8_t num_layers;
@@ -664,10 +664,10 @@ uint8_t *read_layout()
 		printf("R%u  ", row_cnt++);
 	}
 
-	return char_ctr_buf;
+	return (char *)char_ctr_buf;
 }
 
-void write_layout(uint8_t nlayers, uint16_t *p_layout_array)
+void write_layout(uint8_t nlayers, char *p_layout_array)
 {
 	/*uint8_t char_ctrl_buf_p[128] = { 0,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16 };
 
@@ -679,7 +679,7 @@ void write_layout(uint8_t nlayers, uint16_t *p_layout_array)
 
 	p_char_ctrl_buf[0] = nlayers;
 
-	for (uint16_t i = 1, j=0; i < 2 * nlayers*NUMKEYS + 1, j < 2 * nlayers*NUMKEYS; i++, j++)
+	for (uint16_t i = 1, j=0; j < 2 * nlayers*NUMKEYS; i++, j++)
 		p_char_ctrl_buf[i] = *((uint8_t*)p_layout_array+j);
 
 	/*libusb_control_transfer(handle, LIBUSB_RECIPIENT_ENDPOINT | LIBUSB_ENDPOINT_OUT | \
@@ -707,13 +707,13 @@ void write_layout(uint8_t nlayers, uint16_t *p_layout_array)
 	free(p_layout_array);
 }
 
-void write_macros(uint8_t *p_char_ctrl_buf)
+void write_macros(unsigned char *p_char_ctrl_buf)
 {
 	libusb_control_transfer(handle, LIBUSB_RECIPIENT_ENDPOINT | LIBUSB_ENDPOINT_OUT | \
 		LIBUSB_REQUEST_TYPE_VENDOR, USB_WRITE_MACROS, 0, 0, p_char_ctrl_buf, NUM_MACROKEYS*LEN_MACRO, 1000);
 }
 
-void print_usage(uint8_t **argv)
+void print_usage(char **argv)
 {
 	printf("\n\n");
 	printf("Usage: %s [-option] [-optional parameter] [filename]", argv[0]);
@@ -741,9 +741,9 @@ int main(int argc, char **argv)
 {
 
 	uint8_t nlayers = 0;			// dummy arguments for configure_layout() if no existing key file is used
-	uint16_t *p_layout_array_keyfile = NULL;
-	uint8_t *p_macros_array_macrosfile = NULL;
-	uint8_t scan_buf[256] = { 0 };
+	char *p_layout_array_keyfile = NULL;
+	char *p_macros_array_macrosfile = NULL;
+	char scan_buf[256] = { 0 };
 	int err = 0;
 
 	printf("\n");
@@ -905,7 +905,7 @@ int main(int argc, char **argv)
 				p_macros_array_macrosfile = fill_macros_array();
 				printf("\nMacro array filled.");
 				//enable_service_mode();
-				write_macros(p_macros_array_macrosfile);
+				write_macros((unsigned char*)p_macros_array_macrosfile);
 				//disable_service_mode();
 				printf("\nDone.\n");
 			}

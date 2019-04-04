@@ -1,6 +1,6 @@
 #ifdef _WIN32
 
-void configure_layout(uint8_t nlayers, uint16_t *p_layout_array_keyfile)
+void configure_layout(uint8_t nlayers, char *p_layout_array_keyfile)
 {
 	uint8_t last_keypress = 0xff, nlayers_ready = 0, ch = 0, cur_layer_ready = 0, cur_layer = 0,
 		row = 0, col = 0, manual_input = 0;
