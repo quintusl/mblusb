@@ -601,7 +601,7 @@ char *read_layout()
 {
 	static unsigned char char_ctr_buf[2048] = { 0 };
 	uint8_t layout_buf[2048] = {0};
-	uint8_t row_cnt, i, j;
+	uint8_t row_cnt, i, j, k;
 	uint8_t num_layers;
 
 	libusb_control_transfer(handle, LIBUSB_RECIPIENT_ENDPOINT | LIBUSB_ENDPOINT_IN |
@@ -639,12 +639,12 @@ char *read_layout()
 	printf("\n\n");
 	row_cnt = 1;
 	printf("R%u  ", row_cnt++);
-	for (j = 0; j < num_layers; j++)
+	for (k = 0; k < num_layers; k++)
 	{
 
 		for (i = 0; i < NUMKEYS; i++)
 		{
-			printf("%-6u", *((uint16_t*)layout_buf + i + j*NUMKEYS));
+			printf("%-6u", *((uint16_t*)layout_buf + i + k*NUMKEYS));
 			if (i && i != NUMKEYS - 1)
 				if ((i + 1) % 20 == 0)
 				{
@@ -652,10 +652,10 @@ char *read_layout()
 					printf("R%u  ", row_cnt++);
 				}
 		}
-		if (i == NUMKEYS && j == num_layers - 1) break;
+		if (i == NUMKEYS && k == num_layers - 1) break;
 		row_cnt = 1;
 		printf("\n\n");
-		printf("Layer %u", j + 2);
+		printf("Layer %u", k + 2);
 		printf("\n\n");
 		printf("    ");
 		for (j = 1; j < NUMCOLS + 1; j++)
