@@ -477,8 +477,8 @@
 uint16_t layout[2][128] = {
 	{ //Layer 0
 	  //      | Col 0  |  Col 1  |  Col 2  |  Col 3  |  Col 4  |  Col 5  |  Col 6  |  Col 7  |  Col 8  |  Col 9  |  Col 10 |  Col 11 |  Col 12 |  Col 13 |  Col 14 |  Col 15 |
-		/*Row 0*/1111  , KB_A , KB_F1   , KB_F2   , KB_F3   , KB_F4   , KB_F5   , KB_F6   , KB_F7   , KB_F8   , KB_F9   , KB_F10  , KB_F11  , KB_F12  , KB_PSCRN, KB_SCRLK,
-		/*Row 1*/KB_TILDE, KB_1    , KB_NUMLK, KB_3    , KB_4    , KB_5    , KB_6    , KB_7    , KB_8    , KB_9    , KB_SCRLK, KB_MINUS, KB_EQUAL, KB_BKSPC, KB_INS  , KB_HOME ,
+	/*Row 0*/1111  , KB_A , KB_F1   , KB_F2   , KB_F3   , KB_F4   , KB_F5   , KB_F6   , KB_F7   , KB_F8   , KB_F9   , KB_F10  , KB_F11  , KB_F12  , KB_PSCRN, KB_SCRLK,
+	/*Row 1*/KB_TILDE, KB_1    , KB_NUMLK, KB_3    , KB_4    , KB_5    , KB_6    , KB_7    , KB_8    , KB_9    , KB_SCRLK, KB_MINUS, KB_EQUAL, KB_BKSPC, KB_INS  , KB_HOME ,
 	/*Row 2*/KB_TAB  , KB_Q    , KB_CAPLK, KB_E    , KB_R    , KB_T    , KB_Y    , KB_U    , KB_I    , KB_O    , KB_P    , KB_LBRCE, KB_RBRCE, KB_BSLSH, KB_DEL  , KB_END  ,
 	/*Row 3*/KB_CAPLK, KB_A    , KB_S    , KB_D    , KB_F    , KB_G    , KB_H    , KB_J    , KB_K    , KB_L    , KB_SMCLN, KB_QUOTE, KB_A    , KB_ENTER, KB_PGUP , KB_PAUSE,
 	/*Row 4*/KB_LSHFT, KB_Z    , KB_X    , KB_C    , KB_V    , KB_B    , KB_N    , KB_M    , KB_COMMA, KB_DOT  , KB_SLASH, KB_A , KB_RSHFT, KB_A    , KB_PGDN , KB_UP   ,

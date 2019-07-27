@@ -37,9 +37,9 @@
 /*                        Function prototypes                           */
 /************************************************************************/
 
-void print_keyfile(char *p_layout_array, uint8_t nlayers);
+void print_keyfile(uint16_t *p_layout_array, uint8_t nlayers);
 void print_macrosfile(char *p_macros_array);
-char *fill_layout_array(uint8_t nlayers);
+uint16_t *fill_layout_array(uint8_t nlayers);
 char *fill_macros_array(void);
 uint8_t parse_keyfile(char *keyfile_namestring);
 void parse_macrosfile(char *keyfile_namestring);
@@ -49,8 +49,8 @@ void read_version(void);
 void write_pwm(int pwm_USB, int pwm_BT);
 void read_debounce(void);
 void write_debounce(int debounce_value);
-char *read_layout(void);
-void write_layout(uint8_t nlayers, char *p_layout_array);
+uint16_t *read_layout(void);
+void write_layout(uint8_t nlayers, uint16_t *p_layout_array);
 char *read_macros(void);
 void write_macros(unsigned char *p_char_ctrl_buf);
 void print_usage(char **argv);
@@ -128,7 +128,7 @@ const uint16_t hid_code_array[] =
 /*                           Functions                                  */
 /************************************************************************/
 
-void print_keyfile(char *p_layout_array, uint8_t nlayers)
+void print_keyfile(uint16_t *p_layout_array, uint8_t nlayers)
 {
 	FILE *keyfile;
 	char char_buf[8] = { 0 }, scan_buf[256] = { 0 }, string_buf[256] = { 0 }, string_buf2[3072] = { 0 };
@@ -302,14 +302,14 @@ char *fill_macros_array()
 	return macros_array;
 }
 
-char *fill_layout_array(uint8_t nlayers)
+uint16_t *fill_layout_array(uint8_t nlayers)
 {
 	uint8_t chardump = 0, n = 0;
 	char string_buf[8] = { 0 };
 	char *end_p = NULL;
-	char *p_layout_array_keyfile = NULL;
+	uint16_t *p_layout_array_keyfile = NULL;
 
-	p_layout_array_keyfile = (char *)calloc(NUMKEYS * nlayers, sizeof(char));
+	p_layout_array_keyfile = (uint16_t *)calloc(NUMKEYS * nlayers, sizeof(uint16_t));
 
 	for (uint8_t layer = 0; layer < nlayers; layer++)
 	{
@@ -348,7 +348,8 @@ char *fill_layout_array(uint8_t nlayers)
 
 uint8_t parse_keyfile(char *keyfile_namestring)
 {
-	uint8_t nlayers = 0, chardump = 0;
+	uint8_t nlayers = 0;
+	int chardump = 0;
 	FILE *keyfile;
 
 	for (uint16_t i = 0; i < sizeof(string_buffers); i++)
@@ -383,7 +384,8 @@ uint8_t parse_keyfile(char *keyfile_namestring)
 			do {
 				chardump = fgetc(keyfile);
 			} while (isspace(chardump));
-			ungetc(chardump, keyfile);
+			if (chardump != EOF)
+				ungetc(chardump, keyfile);
 
 			//string_buf2[strlen(string_buf2) - 2] = '\0';
 
@@ -597,7 +599,7 @@ char* read_macros()
 	return (char*)char_ctr_buf;
 }
 
-char *read_layout()
+uint16_t *read_layout()
 {
 	static unsigned char char_ctr_buf[2048] = { 0 };
 	uint8_t layout_buf[2048] = {0};
@@ -611,8 +613,6 @@ char *read_layout()
 
 	memcpy(layout_buf, char_ctr_buf+2, sizeof(layout_buf));
 
-	printf("\n\n");
-		
 	if (num_layers == 0)
 	{
 		printf("No layers configured.\n");
@@ -625,7 +625,7 @@ char *read_layout()
 		exit(0);
 	}
 
-	printf("Number of layers: %d", num_layers);
+	printf("\n\nNumber of layers: %d", num_layers);
 	printf("\n\n");
 
 	/*for (uint16_t i = 1; i < num_layers * NUMKEYS + 1; i++)
@@ -664,10 +664,10 @@ char *read_layout()
 		printf("R%u  ", row_cnt++);
 	}
 
-	return (char *)char_ctr_buf;
+	return (uint16_t *)(char_ctr_buf);
 }
 
-void write_layout(uint8_t nlayers, char *p_layout_array)
+void write_layout(uint8_t nlayers, uint16_t *p_layout_array)
 {
 	/*uint8_t char_ctrl_buf_p[128] = { 0,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16 };
 
@@ -675,18 +675,20 @@ void write_layout(uint8_t nlayers, char *p_layout_array)
 	
 	uint8_t *p_char_ctrl_buf = NULL;
 	
-	p_char_ctrl_buf = (uint8_t *)realloc(p_char_ctrl_buf, nlayers * 2 * NUMKEYS + 1);
+	p_char_ctrl_buf = calloc(nlayers * 2 * NUMKEYS + 1, sizeof(*p_char_ctrl_buf));
 
 	p_char_ctrl_buf[0] = nlayers;
 
-	for (uint16_t i = 1, j=0; j < 2 * nlayers*NUMKEYS; i++, j++)
-		p_char_ctrl_buf[i] = *((uint8_t*)p_layout_array+j);
+	for (int i = 1, j=0; j < nlayers * 2 * NUMKEYS; i++, j++) {
+	 	p_char_ctrl_buf[i] = *((uint8_t*)p_layout_array+j);
+	}
 
 	/*libusb_control_transfer(handle, LIBUSB_RECIPIENT_ENDPOINT | LIBUSB_ENDPOINT_OUT | \
 		LIBUSB_REQUEST_TYPE_VENDOR,	USB_WRITE_LAYOUT, 0, 0, NULL, 0, 1000);*/
 
 	libusb_control_transfer(handle, LIBUSB_RECIPIENT_ENDPOINT | LIBUSB_ENDPOINT_OUT | \
-		LIBUSB_REQUEST_TYPE_VENDOR, USB_WRITE_LAYOUT, 0, 0, p_char_ctrl_buf, nlayers*2*NUMKEYS+1, 1000);
+		LIBUSB_REQUEST_TYPE_VENDOR, USB_WRITE_LAYOUT, 0, 0, p_char_ctrl_buf, nlayers * 2 * NUMKEYS + 1, 1000);
+
 
 	/*Sleep(100);
 
@@ -741,7 +743,7 @@ int main(int argc, char **argv)
 {
 
 	uint8_t nlayers = 0;			// dummy arguments for configure_layout() if no existing key file is used
-	char *p_layout_array_keyfile = NULL;
+	uint16_t *p_layout_array_keyfile = NULL;
 	char *p_macros_array_macrosfile = NULL;
 	char scan_buf[256] = { 0 };
 	int err = 0;
